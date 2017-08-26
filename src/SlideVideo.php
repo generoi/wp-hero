@@ -57,7 +57,7 @@ class SlideVideo extends Slide implements SlideInterface
     /** @inheritdoc */
     public function css_inline()
     {
-        $selector = '.responsive-embed';
+        $selector = '.wp-hero__responsive-embed';
         $padding = $this->intrinsic_ratio() * 100;
         return "#{$this->css_id} $selector { padding-bottom: $padding%; }";
     }

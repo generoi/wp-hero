@@ -70,7 +70,7 @@ class SlideImage extends Slide implements SlideInterface
     /** @inheritdoc */
     public function css_inline()
     {
-        $selector = 'picture';
+        $selector = '.wp-hero__responsive-embed';
         $breakpoints = array_reverse($this->get_breakpoint());
 
         foreach ($breakpoints as $breakpoint => $data) {
