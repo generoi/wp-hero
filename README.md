@@ -50,7 +50,7 @@ add_filter('wp-hero/slide/breakpoints', function ($breakpoints) {
   $breakpoints['desktop']['min-width'] = '1200px';
 });
 
-// Whether to conver all slide images to JPGs.
+// Whether to convert all slide images to JPGs.
 add_filter('wp-hero/slide/tojpg', '__return_false');
 
 // Set default slide values.
