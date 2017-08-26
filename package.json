@@ -1,7 +1,7 @@
 {
-  "name": "wp-plugin-boilerplate",
+  "name": "wp-hero",
   "version": "1.0.0",
-  "description": "A boilerplate WordPress plugin",
+  "description": "A Hero banner plugin for Wordpress",
   "main": "assets/scripts/plugin.js",
   "scripts": {
     "watch": "NODE_ENV=development webpack --hide-modules --watch --config node_modules/laravel-mix/setup/webpack.config.js",
@@ -124,14 +124,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/generoi/wp-plugin-boilerplate.git"
+    "url": "git+https://github.com/generoi/wp-hero.git"
   },
   "author": "Oskar Schöldström",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/generoi/wp-plugin-boilerplate/issues"
+    "url": "https://github.com/generoi/wp-hero/issues"
   },
-  "homepage": "https://github.com/generoi/wp-plugin-boilerplate#readme",
+  "homepage": "https://github.com/generoi/wp-hero#readme",
   "engines": {
     "node": ">= 6.9.4"
   },

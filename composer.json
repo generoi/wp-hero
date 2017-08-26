@@ -1,9 +1,9 @@
 {
-  "name": "generoi/wp-plugin-boilerplate",
+  "name": "generoi/wp-hero",
   "type": "wordpress-plugin",
   "license": "MIT",
-  "description": "A boilerplate WordPress plugin",
-  "homepage": "https://github.com/generoi/wp-plugin-boilerplate",
+  "description": "A Hero banner plugin for Wordpress",
+  "homepage": "https://github.com/generoi/wp-hero",
   "authors": [
     {
       "name": "Oskar Schöldström",
@@ -14,7 +14,12 @@
     "wordpress"
   ],
   "support": {
-    "issues": "https://github.com/generoi/wp-plugin-boilerplate/issues"
+    "issues": "https://github.com/generoi/wp-hero/issues"
+  },
+  "autoload": {
+    "psr-4": {
+      "GeneroWP\\Hero\\": "src/"
+    }
   },
   "repositories": [
     {
