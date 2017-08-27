@@ -38,6 +38,8 @@ class Plugin
         register_deactivation_hook(__FILE__, [__CLASS__, 'deactivate']);
 
         add_action('acf/init', [$this, 'register_acf_fields']);
+        add_action('acf/location/rule_types', [$this, 'acf_location_rule_type']);
+        add_action('acf/location/rule_match/hero', [$this, 'acf_location_rule_match'], 10, 3);
         add_filter('wpseo_opengraph_image', [$this, 'set_og_image']);
         add_action('wp_enqueue_scripts', [$this, 'register_assets']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
@@ -54,6 +56,45 @@ class Plugin
     public function enqueue_assets()
     {
         wp_enqueue_style('wp-hero/css');
+    }
+
+    /**
+     * Define a custom ACF location rule type.
+     */
+    public function acf_location_rule_type($choices)
+    {
+        $choices['WP Hero']['hero'] = 'Custom match';
+        return $choices;
+    }
+
+    /**
+     * Return if custom location rule is matched on particular screen.
+     *
+     * @param bool $match
+     * @param array $rule
+     * @param array $options
+     * @return bool
+     */
+    public function acf_location_rule_match($match, $rule, $options)
+    {
+        $match = false;
+
+        if (isset($options['taxonomy'])) {
+            $match = in_array($options['taxonomy'], get_taxonomies(['public' => true]));
+            $match = apply_filters('wp-hero/visible/taxonomy', $match, $options['taxonomy']);
+        }
+
+        if (isset($options['post_type'])) {
+            $match = in_array($options['post_type'], get_post_types(['public' => true]));
+
+            if ($match && $options['post_type'] === 'attachment') {
+                $match = false;
+            }
+
+            $match = apply_filters('wp-hero/visible/post_type', $match, $options['post_type']);
+        }
+
+        return apply_filters('wp-hero/visible', $match, $options);
     }
 
     /**

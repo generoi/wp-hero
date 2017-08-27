@@ -37,10 +37,18 @@ See [generoi/sage](https://github.com/generoi/sage/blob/genero/resources/views/l
 ## API
 
 ```php
-// @todo acf hook for setting themes, post-types etc.
+add_filter('wp-hero/visible', '__return_false');
+add_filter('wp-hero/visible/{taxonomy|post_type}', function ($match, $taxonomy) {
+  if ($taxonomy === 'foobar') {
+    $match = false;
+  }
+  return $match;
+}, 10, 2);
 
 // Disable slide fallback functionality.
-add_filter('wp-hero/fallback', '__return_false');
+add_filter('wp-hero/fallback', function () {
+  return is_single() && !is_singular('job');
+});
 add_filter('wp-hero/fallback/thumbnail', '__return_false');
 add_filter('wp-hero/fallback/parent', '__return_false');
 add_filter('wp-hero/fallback/default_image', '__return_false');
@@ -61,6 +69,16 @@ add_filter('wp-hero/slide/defaults', function ($defaults) {
 add_filter('wp-hero/slide/defaults/{image|video}', function ($defaults) {
   $defaults['slide_video_poster'] = 'xyz';
   return $defaults;
+});
+
+// Add custom overlay or theme options
+add_filter('acf/load_field/name=slide_overlay', function ($field) {
+    $field['choices']['primary'] = __('Primary');
+    return $field;
+});
+add_filter('acf/load_field/name=slide_theme', function ($field) {
+    unset($field['choices']['boxed']);
+    return $field;
 });
 ```
 
