@@ -62,7 +62,7 @@ class SlideImage extends Slide implements SlideInterface
 
         $sources = implode('', $sources);
 
-        $content = "<picture class=\"wp-hero__responsive-embed\">$sources</picture>";
+        $content = "<picture id=\"$this->css_id\" class=\"wp-hero__responsive-embed\">$sources</picture>";
         $content .= "<style>{$this->css_inline()}</style>";
         return $content;
     }
@@ -70,7 +70,6 @@ class SlideImage extends Slide implements SlideInterface
     /** @inheritdoc */
     public function css_inline()
     {
-        $selector = '.wp-hero__responsive-embed';
         $breakpoints = array_reverse($this->get_breakpoint());
 
         foreach ($breakpoints as $breakpoint => $data) {
@@ -81,7 +80,7 @@ class SlideImage extends Slide implements SlideInterface
                 $wrapper = "@media screen and (min-width: {$data['min-width']}) { %s } ";
             }
 
-            $css[] = sprintf($wrapper, "#$this->css_id $selector { padding-bottom: $padding%; }");
+            $css[] = sprintf($wrapper, "#$this->css_id { padding-bottom: $padding%; }");
         }
         return implode('', $css);
     }

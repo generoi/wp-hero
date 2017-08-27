@@ -23,7 +23,7 @@ abstract class Slide extends Timber\Core implements Timber\CoreInterface
         $this->import(array_merge($this->get_defaults(), $values));
 
         $this->index = self::$counter++;
-        $this->css_id = "slick-slide-{$this->index}";
+        $this->css_id = "wp-hero-slide-{$this->index}";
     }
 
     /**
