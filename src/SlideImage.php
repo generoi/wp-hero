@@ -18,7 +18,7 @@ class SlideImage extends Slide implements SlideInterface
         if (apply_filters('wp-hero/slide/tojpg', true)) {
             $src = Timber\ImageHelper::img_to_jpg($this->image->src());
             $this->image->init($src);
-            $this->fix_bedrock_loc($this->image);
+            Image\Helper::fix_bedrock_loc($this->image);
         }
     }
 
@@ -29,7 +29,7 @@ class SlideImage extends Slide implements SlideInterface
     }
 
     /** @inheritdoc */
-    public function media_html()
+    public function render_media()
     {
         $breakpoints = $this->get_breakpoint();
 
@@ -177,26 +177,26 @@ class SlideImage extends Slide implements SlideInterface
             $crop = true;
         }
 
-        if ($crop && !$crop_format) {
-            // Cropping is enforced and we can use the WP thumbnail.
-            $src = $image->src($breakpoint);
-            $src_retina = $this->retina($image, $dimensions);
-        } elseif ($crop && $crop_format) {
+        if ($crop_format) {
             // Cropping is enforced but no thumbnail exists.
             $src = Timber\ImageHelper::resize($image->src(), $dimensions['width'], $dimensions['height'], $dimensions['crop']);
-            $src_retina = $this->retina($image, $dimensions);
-        } elseif (!$crop) {
+            $src_retina = Image\Helper::retina($image, $dimensions);
+        } elseif ($crop) {
+            // Cropping is enforced and we can use the WP thumbnail.
+            $src = $image->src($breakpoint);
+            $src_retina = Image\Helper::retina($image, $dimensions);
+        } else {
             // Cropping is not enforced, scale instead.
             // @todo hardcoded breakpoint name.
             if (!$this->has_smartcrop() && $breakpoint === 'mobile') {
                 // Mobile usually requires a taller crop to fit content.
                 $src = Timber\ImageHelper::resize($image->src(), $dimensions['width'], $dimensions['height']);
-                $src_retina = $this->retina($image, $dimensions);
+                $src_retina = Image\Helper::retina($image, $dimensions);
             } else {
                 // WP generates a cropped thumbnail, so it's unusable. Resize the
                 // original image by width only.
                 $src = Timber\ImageHelper::resize($image->src(), $dimensions['width']);
-                $src_retina = $this->retina($image, [
+                $src_retina = Image\Helper::retina($image, [
                     'width' => $dimensions['width'],
                     'height' => 0,
                     'crop' => $dimensions['crop'],
@@ -232,18 +232,19 @@ class SlideImage extends Slide implements SlideInterface
 
             // Re-crop the image if YoImages has crop formats defined.
             if ($crop_format) {
+                $op = new Image\Operation\Crop($crop_format['x'], $crop_format['y'], $crop_format['width'], $crop_format['height']);
+
                 // Use the orignial image name in the filename rather than the
                 // replacement.
-                $destination_path = $this->crop_destination_path($this->image->file_loc, $crop_format);
-                $destination_url = $this->crop_destination_url($this->image->src, $crop_format);
-                // Crop the image using the YoImage crop data.
-                $result = $this->crop(
-                    $image->file_loc,
-                    $destination_path,
-                    $crop_format
-                );
+                $au = Timber\ImageHelper::analyze_url($this->image->file_loc);
+                $new_filename = $op->filename($au['filename'], $au['extension']);
+
+                $source_path = $image->file_loc;
+                $destination_path = Image\Helper::get_destination_path($image->file_loc, $new_filename);
+                $destination_url = Image\Helper::get_destination_url($image->src, $new_filename);
+                Image\Helper::operate($source_path, $destination_path, $op);
                 $image = new Timber\Image($destination_url);
-                $this->fix_bedrock_loc($image);
+                Image\Helper::fix_bedrock_loc($image);
             }
 
             $this->images[$breakpoint] = $image;
@@ -312,131 +313,5 @@ class SlideImage extends Slide implements SlideInterface
             return $sizes[$size];
         }
         return null;
-    }
-
-    /**
-     * Generate and get the retina URL of an image.
-     *
-     * @param Timber\Image $image Original un-resized image.
-     * @param array $dimensions Size dimensions.
-     * @return string
-     */
-    protected function retina($image, $dimensions)
-    {
-        $source = $image->src();
-        $width = $dimensions['width'] * 2;
-        $height = $dimensions['height'] * 2;
-        $max_width = $image->width();
-        $max_height = $image->height();
-        $aspect_ratio = $height / $width;
-
-        if ($width > $max_width) {
-            $width = $max_width;
-            $height = $width * $aspect_ratio;
-        }
-
-        if ($height > $max_height) {
-            $height = $max_height;
-            $width = $height / $aspect_ratio;
-        }
-        $width = round($width);
-        $height = round($height);
-
-        $crop = $dimensions['crop'];
-        $src = Timber\ImageHelper::resize($source, $width, $height, $crop);
-        return $src;
-    }
-
-    /**
-     * Get the destination URL of a cropped image.
-     *
-     * @param string $source URL of the source image
-     * @param array $crop Crop values set by YoImages
-     * @return string
-     */
-    protected function crop_destination_url($source, $crop)
-    {
-        $url_parts = parse_url($source);
-        $url_parts['path'] = $this->crop_destination_path($url_parts['path'], $crop);
-        $scheme = isset($url_parts['scheme']) ? $url_parts['scheme'] . '://' : '';
-        $host   = isset($url_parts['host'])   ? $url_parts['host'] : '';
-        $port   = isset($url_parts['port'])   ? ':' . $url_parts['port'] : '';
-        $path   = isset($url_parts['path'])   ? $url_parts['path'] : '';
-        return "$scheme$host$port$path";
-    }
-
-    /**
-     * Get the destination path of a cropped image.
-     *
-     * @param string $source File path of the source image
-     * @param array $crop Crop values set by YoImages
-     * @return string
-     */
-    protected function crop_destination_path($source, $crop)
-    {
-        $parts = pathinfo($source);
-        $parts['filename'] = $this->crop_filename($parts['filename'], $crop);
-        return $parts['dirname'] . '/' . $parts['filename'] . '.' . $parts['extension'];
-    }
-
-
-    /**
-     * Get the filename of a cropped image.
-     *
-     * @param string $filename Filename without extension.
-     * @param array $crop Crop values set by YoImages
-     * @return string
-     */
-    protected function crop_filename($filename, $crop)
-    {
-        // We use a custom pattern which we clean out using a hook when the
-        // original is deleted.
-        return $filename . '-wp-hero-crop'
-            . '-' . $crop['width'] . 'x' . $crop['height']
-            . '-' . $crop['x'] . 'x' . $crop['y'];
-    }
-
-    /**
-     * Crop an image.
-     *
-     * @param string $source File path to source image
-     * @param string $destination File path to destination image
-     * @param array $crop Crop values set by YoImages
-     * @return bool
-     */
-    protected function crop($source, $destination, $crop)
-    {
-        if (file_exists($source) && file_exists($destination)) {
-            if (filemtime($source) > filemtime($destination)) {
-                unlink($destination);
-            }
-            return true;
-        }
-
-        $image = wp_get_image_editor($source);
-        if (!is_wp_error($image)) {
-            $image->crop(
-                $crop['x'],
-                $crop['y'],
-                // source size
-                $crop['width'],
-                $crop['height'],
-                // target size
-                $crop['width'],
-                $crop['height']
-            );
-            $result = $image->save($destination);
-            if (is_wp_error($result)) {
-                Timber\Helper::error_log('Error cropping image (wp-hero)');
-                Timber\Helper::error_log($result);
-            } else {
-                return true;
-            }
-        } elseif (isset($image->error_data['error_loading_image'])) {
-            Timber\Helper::error_log('Error loading (wp-hero) ' . $image->error_data['error_loading_image']);
-        } else {
-            Timber\Helper::error_log($image);
-        }
-        return false;
     }
 }

@@ -9,7 +9,7 @@ interface SlideInterface
      *
      * @return string
      */
-    public function media_html();
+    public function render_media();
 
     /**
      * Return a string of CSS that sets slide's ratio before the the browser

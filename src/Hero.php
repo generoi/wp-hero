@@ -32,7 +32,7 @@ class Hero extends Timber\Core implements Timber\CoreInterface
             $this->object = new Timber\Post($this->object);
             $this->object_type = 'post';
         } else {
-            // @todo error handling?
+            return [];
         }
 
         $this->ID = $this->object->ID;

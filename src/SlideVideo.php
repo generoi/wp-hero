@@ -22,7 +22,7 @@ class SlideVideo extends Slide implements SlideInterface
     }
 
     /** @inheritdoc */
-    public function media_html()
+    public function render_media()
     {
         $attributes = [];
         if ($this->slide_video_width) {
