@@ -13,6 +13,7 @@ namespace GeneroWP\Hero;
 
 use WPSEO_Options;
 use WP_Post;
+use Timber;
 
 if (!defined('ABSPATH')) {
     exit;
