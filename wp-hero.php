@@ -155,7 +155,7 @@ class Plugin
         }
         $attachment = new Timber\Image($post_id);
         if ($attachment->file_loc) {
-            $parts = pathinfo($local_file);
+            $parts = pathinfo($attachment->file_loc);
             $dirname = $parts['dirname'];
             $ext = $parts['extension'];
             $filename = $parts['filename'];
