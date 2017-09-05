@@ -15,7 +15,23 @@ class Hero extends Timber\Core implements Timber\CoreInterface
         if (!isset($object)) {
             $object = get_queried_object();
         }
-        $this->object = $object;
+
+        $match_options = [];
+        if (isset($object->post_type)) {
+            $match_options = [
+                'post_type' => $object->post_type,
+                'post_id' => $object->ID,
+            ];
+        } elseif (isset($object->taxonomy)) {
+            $match_options = [
+                'taxonomy' => $object->taxonomy,
+                'term_id' =>  $object->term_id,
+            ];
+        }
+
+        if (apply_filters('acf/location/rule_match/hero', true, [], $match_options)) {
+            $this->object = $object;
+        }
     }
 
     /**

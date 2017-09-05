@@ -39,8 +39,8 @@ class Plugin
         register_deactivation_hook(__FILE__, [__CLASS__, 'deactivate']);
 
         add_action('acf/init', [$this, 'register_acf_fields']);
-        add_action('acf/location/rule_types', [$this, 'acf_location_rule_type']);
-        add_action('acf/location/rule_match/hero', [$this, 'acf_location_rule_match'], 10, 3);
+        add_filter('acf/location/rule_types', [$this, 'acf_location_rule_type']);
+        add_filter('acf/location/rule_match/hero', [$this, 'acf_location_rule_match'], 10, 3);
         add_filter('wpseo_opengraph_image', [$this, 'set_og_image']);
         add_action('wp_enqueue_scripts', [$this, 'register_assets']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
