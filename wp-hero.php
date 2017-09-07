@@ -41,7 +41,8 @@ class Plugin
         add_action('acf/init', [$this, 'register_acf_fields']);
         add_filter('acf/location/rule_types', [$this, 'acf_location_rule_type']);
         add_filter('acf/location/rule_match/hero', [$this, 'acf_location_rule_match'], 10, 3);
-        add_filter('wpseo_opengraph_image', [$this, 'set_og_image']);
+        add_filter('wpseo_opengraph_image', [$this, 'wpseo_og_image']);
+        add_filter('the_seo_framework_og_image_after_featured', [$this, 'seoframework_og_image']);
         add_action('wp_enqueue_scripts', [$this, 'register_assets']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
         add_action('delete_attachment', [$this, 'delete_timber_variations']);
@@ -102,8 +103,9 @@ class Plugin
      * Yoast integration for setting a default og:image based on the hero.
      *
      * @param string $image the URL to the image.
+     * @return string
      */
-    public function set_og_image($image)
+    public function wpseo_og_image($image)
     {
         $options = WPSEO_Options::get_option('wpseo_social');
         if ($image != $options['og_default_image']) {
@@ -120,6 +122,20 @@ class Plugin
             return $hero[0]['slide_image'];
         }
         return $image;
+    }
+
+    /**
+     * SEO Framework integration for setting a default og:image based on the hero.
+     *
+     * @return string
+     */
+    public function seoframework_og_image()
+    {
+        // Use the first hero slide's image if available.
+        $hero = get_field('hero_slide', get_queried_object_id());
+        if (!empty($hero[0]['slide_image'])) {
+            return wp_get_attachment_url($hero[0]['slide_image']);
+        }
     }
 
     /**
