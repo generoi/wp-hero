@@ -67,7 +67,7 @@ acf_add_local_field_group(array (
 					'key' => 'field_5856c879e8756',
 					'label' => 'Link',
 					'name' => 'slide_link',
-					'type' => 'url',
+					'type' => 'link',
 					'instructions' => '',
 					'required' => 0,
 					'conditional_logic' => 0,
@@ -76,8 +76,7 @@ acf_add_local_field_group(array (
 						'class' => '',
 						'id' => '',
 					),
-					'default_value' => '',
-					'placeholder' => '',
+					'return_format' => 'array',
 				),
 				array (
 					'key' => 'field_58470ec9edfeb',
