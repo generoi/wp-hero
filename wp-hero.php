@@ -189,7 +189,7 @@ class Plugin
         foreach ([
             'advanced-custom-fields-pro/acf.php' => 'Advanced Custom Fields PRO',
             'timber-library/timber.php' => 'Timber Library',
-            // 'wp-timber-extended/wp-timber-extended.php' => 'WP Timber Extended',
+            'wp-timber-extended/wp-timber-extended.php' => 'WP Timber Extended',
         ] as $plugin => $name) {
             if (!is_plugin_active($plugin) && current_user_can('activate_plugins')) {
                 wp_die(sprintf(

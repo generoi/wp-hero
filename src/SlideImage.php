@@ -3,22 +3,28 @@
 namespace GeneroWP\Hero;
 
 use Timber;
+use TimberExtended;
 
 class SlideImage extends Slide implements SlideInterface
 {
     /** @var Timber\Image[] */
     protected $images = [];
 
+    public $ImageClass = 'Timber\Image';
+
     /** @inheritdoc */
     public function __construct($values = null)
     {
         parent::__construct($values);
 
-        $this->image = new Timber\Image($this->slide_image);
+        if (class_exists('TimberExtended') && $this->ImageClass === 'Timber\Image') {
+            $this->ImageClass = TimberExtended::get_object_class('image', null, $this);
+        }
+        $this->image = new $this->ImageClass($this->slide_image);
+
         if (apply_filters('wp-hero/slide/tojpg', true)) {
             $src = Timber\ImageHelper::img_to_jpg($this->image->src());
             $this->image->init($src);
-            Image\Helper::fix_bedrock_loc($this->image);
         }
     }
 
@@ -226,7 +232,7 @@ class SlideImage extends Slide implements SlideInterface
 
             // If there's a replacement image for this breakpoint.
             if (isset($crop_format['replacement'])) {
-                $image = new Timber\Image($crop_format['replacement']);
+                $image = new $this->ImageClass($crop_format['replacement']);
             }
 
             // Re-crop the image if YoImages has crop formats defined.
@@ -242,8 +248,7 @@ class SlideImage extends Slide implements SlideInterface
                 $destination_path = Image\Helper::get_destination_path($image->file_loc, $new_filename);
                 $destination_url = Image\Helper::get_destination_url($image->src, $new_filename);
                 Image\Helper::operate($source_path, $destination_path, $op);
-                $image = new Timber\Image($destination_url);
-                Image\Helper::fix_bedrock_loc($image);
+                $image = new $this->ImageClass($destination_url);
             }
 
             $this->images[$breakpoint] = $image;

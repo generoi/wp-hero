@@ -6,6 +6,7 @@
 
 - Advanced Custom Fields PRO
 - Timber Library
+- WP Timber Extended
 
 ## Features
 

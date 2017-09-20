@@ -86,20 +86,6 @@ class Helper
         return $src;
     }
 
-
-    /**
-     * Manipulate a Timber\Image object, correcting it's file and file_loc
-     * paths when re-initialized from URLs.
-     *
-     * @see https://github.com/timber/timber/issues/1458
-     * @param Timber\Image $image Image to fix paths on.
-     */
-    public static function fix_bedrock_loc($image)
-    {
-        $image->file_loc = str_replace('web/wp/app', 'web/app', $image->file_loc);
-        $image->file = str_replace('web/wp/app', 'web/app', $image->file);
-    }
-
     /**
      * Generate and get the retina URL of an image.
      *
