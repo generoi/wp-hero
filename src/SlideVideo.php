@@ -56,19 +56,14 @@ class SlideVideo extends Slide implements SlideInterface
         $attributes = implode(' ', $attributes);
         $sources = implode('', $sources);
 
+        $padding = $this->intrinsic_ratio() * 100;
+
         return "
             <div class=\"wp-hero__responsive-embed\" id=\"$this->css_id\">
               <video $attributes>$sources</video>
             </div>
-            <style>{$this->css_inline()}</style>
+            <style>#{$this->css_id} { padding-bottom: $padding%; }</style>
         ";
-    }
-
-    /** @inheritdoc */
-    public function css_inline()
-    {
-        $padding = $this->intrinsic_ratio() * 100;
-        return "#{$this->css_id} { padding-bottom: $padding%; }";
     }
 
     /** @inheritdoc */

@@ -12,14 +12,6 @@ interface SlideInterface
     public function render_media();
 
     /**
-     * Return a string of CSS that sets slide's ratio before the the browser
-     * has managed to calculate it's size.
-     *
-     * @return string
-     */
-    public function css_inline();
-
-    /**
      * Get the type of slider item, eg. image, video.
      *
      * @return string
