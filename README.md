@@ -54,6 +54,15 @@ add_filter('wp-hero/fallback/thumbnail', '__return_false');
 add_filter('wp-hero/fallback/parent', '__return_false');
 add_filter('wp-hero/fallback/default_image', '__return_false');
 
+// Set a default slide fallback
+add_filter('wp-hero/fallback/default', function ($defaults) {
+    return SlideFactory::create([
+        'slide_type' => 'image',
+        'slide_image' => asset_path('images/hero.jpg'),
+        'slide_title' => get_the_title(),
+    ]);
+});
+
 // Modify/add breakpoint thumbnail sizes and minimum widths.
 add_filter('wp-hero/slide/breakpoints', function ($breakpoints) {
   $breakpoints['desktop']['min-width'] = '1200px';

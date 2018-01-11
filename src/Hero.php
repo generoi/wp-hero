@@ -127,6 +127,8 @@ class Hero extends Timber\Core implements Timber\CoreInterface
         //         ]);
         //     }
         // }
+
+        return apply_filters('wp-hero/fallback/default', $this);
     }
 
     /** @inheritdoc */
