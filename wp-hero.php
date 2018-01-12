@@ -3,7 +3,7 @@
 Plugin Name:        Hero
 Plugin URI:         http://genero.fi
 Description:        A Hero banner plugin for Wordpress
-Version:            0.1-alpha.3
+Version:            0.1-alpha.4
 Author:             Genero
 Author URI:         http://genero.fi/
 License:            MIT License
@@ -14,6 +14,7 @@ namespace GeneroWP\Hero;
 use WPSEO_Options;
 use WP_Post;
 use Timber;
+use Puc_v4_Factory;
 
 if (!defined('ABSPATH')) {
     exit;
