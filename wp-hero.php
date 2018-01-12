@@ -3,7 +3,7 @@
 Plugin Name:        Hero
 Plugin URI:         http://genero.fi
 Description:        A Hero banner plugin for Wordpress
-Version:            1.0.0
+Version:            0.1-alpha.3
 Author:             Genero
 Author URI:         http://genero.fi/
 License:            MIT License
@@ -23,7 +23,9 @@ class Plugin
 {
 
     private static $instance = null;
-    public $version = '1.0.0';
+    public $version = '0.1-alpha.3';
+    public $plugin_name = 'wp-hero';
+    public $github_url = 'https://github.com/generoi/wp-hero';
 
     public static function get_instance()
     {
@@ -33,11 +35,18 @@ class Plugin
         return self::$instance;
     }
 
-    public function init()
+    public function __construct()
     {
         register_activation_hook(__FILE__, [__CLASS__, 'activate']);
         register_deactivation_hook(__FILE__, [__CLASS__, 'deactivate']);
 
+        Puc_v4_Factory::buildUpdateChecker($this->github_url, __FILE__, $this->plugin_name);
+
+        add_action('plugins_loaded', [$this, 'init']);
+    }
+
+    public function init()
+    {
         add_action('acf/init', [$this, 'register_acf_fields']);
         add_filter('acf/location/rule_types', [$this, 'acf_location_rule_type']);
         add_filter('acf/location/rule_match/hero', [$this, 'acf_location_rule_match'], 10, 3);
@@ -213,4 +222,4 @@ if (file_exists($composer = __DIR__ . '/vendor/autoload.php')) {
     require_once $composer;
 }
 
-Plugin::get_instance()->init();
+Plugin::get_instance();
