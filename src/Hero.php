@@ -51,11 +51,10 @@ class Hero extends Timber\Core implements Timber\CoreInterface
             return [];
         }
 
-        $this->ID = $this->object->ID;
         $this->slides = [];
 
-        if ($slides = get_field('hero_slide', $this->ID)) {
-            $force_crop = get_field('hero_crop', $this->ID);
+        if ($slides = get_field('hero_slide', $this->object)) {
+            $force_crop = get_field('hero_crop', $this->object);
 
             foreach ($slides as $slide) {
                 $this->slides[] = SlideFactory::create(array_merge($slide, [
