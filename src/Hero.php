@@ -14,6 +14,9 @@ class Hero extends Timber\Core implements Timber\CoreInterface
     {
         if (!isset($object)) {
             $object = get_queried_object();
+            if ($object instanceof WP_Post_Type && $object->name === 'product' && function_exists('wc_get_page_id')) {
+                $object = get_post(wc_get_page_id('shop'));
+            }
         }
 
         $match_options = [];
