@@ -4,6 +4,7 @@ namespace GeneroWP\Hero;
 
 use GeneroWP\Hero\Slide;
 use Timber;
+use WP_Post_Type;
 
 class Hero extends Timber\Core implements Timber\CoreInterface
 {
