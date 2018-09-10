@@ -12,8 +12,6 @@ License URI:        http://opensource.org/licenses/MIT
 namespace GeneroWP\Hero;
 
 use WPSEO_Options;
-use WP_Post;
-use WP_Post_Type;
 use Timber;
 use Puc_v4_Factory;
 
@@ -119,7 +117,7 @@ class Plugin
     public function wpseo_og_image($og)
     {
         $object = get_queried_object();
-        if ($object instanceof WP_Post_Type) {
+        if ($object instanceof \WP_Post_Type) {
             // basic acf-genero-components integration
             $pages = get_pages([
                 'meta_key' => 'archive__post_type',
@@ -136,14 +134,28 @@ class Plugin
             }
         }
 
-        if ($object instanceof WP_Post && !has_post_thumbnail($object)) {
-            // Use the first hero slide's image if available.
-            $hero = get_field('hero_slide', $object);
-            if (!empty($hero[0]['slide_image'])) {
-                $og->add_image(
-                    ['url' => wp_get_attachment_url($hero[0]['slide_image'])]
-                );
+        $hero = get_field('hero_slide', $object);
+        if ($object instanceof \WP_Post && has_post_thumbnail($object)) {
+            $image = get_the_post_thumbnail_url($object);
+        } elseif ($object instanceof \WP_Term) {
+            foreach (['thumbnail_id', 'thumbnail', 'product_cat_thumbnail'] as $field) {
+                if ($thumbnail = get_field($field, $object)) {
+                    if (is_numeric($thumbnail)) {
+                        $image = wp_get_attachment_url($thumbnail);
+                    } elseif (is_string($thumbnail)) {
+                        $image = $thumbnail;
+                    } elseif (is_array($thumbnail) && isset($thumbnail['url'])) {
+                        $image = $thumbnail['url'];
+                    }
+                    break;
+                }
             }
+        } elseif (!empty($hero[0]['slide_image'])) {
+            $image = wp_get_attachment_url($hero[0]['slide_image']);
+        }
+
+        if (!empty($image)) {
+            $og->add_image($image);
         }
     }
 
