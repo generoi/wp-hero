@@ -13,6 +13,7 @@ namespace GeneroWP\Hero;
 
 use WPSEO_Options;
 use WP_Post;
+use WP_Post_Type;
 use Timber;
 use Puc_v4_Factory;
 
@@ -51,7 +52,7 @@ class Plugin
         add_action('acf/init', [$this, 'register_acf_fields']);
         add_filter('acf/location/rule_types', [$this, 'acf_location_rule_type']);
         add_filter('acf/location/rule_match/hero', [$this, 'acf_location_rule_match'], 10, 3);
-        add_filter('wpseo_opengraph_image', [$this, 'wpseo_og_image']);
+        add_action('wpseo_add_opengraph_additional_images', [$this, 'wpseo_og_image']);
         add_filter('the_seo_framework_og_image_after_featured', [$this, 'seoframework_og_image']);
         add_action('wp_enqueue_scripts', [$this, 'register_assets']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
@@ -115,23 +116,35 @@ class Plugin
      * @param string $image the URL to the image.
      * @return string
      */
-    public function wpseo_og_image($image)
+    public function wpseo_og_image($og)
     {
-        $options = WPSEO_Options::get_option('wpseo_social');
-        if ($image != $options['og_default_image']) {
-            return $image;
-        }
         $object = get_queried_object();
-        // If it's a real thumbnail, use it.
-        if ($object instanceof WP_Post && has_post_thumbnail($object)) {
-            return $image;
+        if ($object instanceof WP_Post_Type) {
+            // basic acf-genero-components integration
+            $pages = get_pages([
+                'meta_key' => 'archive__post_type',
+                'meta_value' => "post_type:$object->name",
+                'meta_compare' => 'LIKE',
+                'number' => 1,
+            ]);
+
+            if (!empty($pages)) {
+                $object = reset($pages);
+            } elseif (function_exists('is_product_category')) {
+                // woocommerce
+                $object = get_post(get_option('woocommerce_shop_page_id'));
+            }
         }
-        // Use the first hero slide's image if available.
-        $hero = get_field('hero_slide', $object);
-        if (!empty($hero[0]['slide_image'])) {
-            return $hero[0]['slide_image'];
+
+        if ($object instanceof WP_Post && !has_post_thumbnail($object)) {
+            // Use the first hero slide's image if available.
+            $hero = get_field('hero_slide', $object);
+            if (!empty($hero[0]['slide_image'])) {
+                $og->add_image(
+                    ['url' => wp_get_attachment_url($hero[0]['slide_image'])],
+                );
+            }
         }
-        return $image;
     }
 
     /**
