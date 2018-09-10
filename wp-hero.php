@@ -141,7 +141,7 @@ class Plugin
             $hero = get_field('hero_slide', $object);
             if (!empty($hero[0]['slide_image'])) {
                 $og->add_image(
-                    ['url' => wp_get_attachment_url($hero[0]['slide_image'])],
+                    ['url' => wp_get_attachment_url($hero[0]['slide_image'])]
                 );
             }
         }
