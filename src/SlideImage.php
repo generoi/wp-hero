@@ -56,13 +56,13 @@ class SlideImage extends Slide implements SlideInterface
             }
 
             $padding = $image->intrinsic_ratio() * 100;
-            $css[] = sprintf($css_wrapper, "#$this->css_id { padding-bottom: $padding%; }");
+            $css[] = sprintf($css_wrapper, ".$this->css_id { padding-bottom: $padding%; }");
         }
 
         $sources = implode('', $sources);
         $css = implode('', array_reverse($css));
 
-        $content = "<picture id=\"$this->css_id\" class=\"wp-hero__responsive-embed\">$sources</picture>";
+        $content = "<picture class=\"wp-hero__responsive-embed $this->css_id\">$sources</picture>";
         $content .= "<style>{$css}</style>";
         return $content;
     }
